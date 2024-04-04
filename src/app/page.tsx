@@ -10,7 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import client from '../../lib/client';
 import { gql } from '@apollo/client';
 
-const getAllMansions = async () => {
+const getAllMansions = async (event) => {
   const GET_MANSIONS = gql`
     query GetMansions($name: String!) {
       mansionList(name: $name) {
@@ -23,7 +23,7 @@ const getAllMansions = async () => {
     const { data } = await client.query({
       query: GET_MANSIONS,
       variables: {
-        name: "旗",
+        name: event.target.value || '旗の台',
       },
     });
 
@@ -34,6 +34,8 @@ const getAllMansions = async () => {
 };
 
 export default function CustomizedInputBase() {
+  const [value, setValue] = React.useState();
+
   return (
     <Paper
       component="form"
@@ -47,12 +49,12 @@ export default function CustomizedInputBase() {
         placeholder="Input the name of the mansion house"
         inputProps={{ 'aria-label': 'search mansion trends' }}
         onBlur={getAllMansions}
+        // value={value}
       />
       <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
       <IconButton type="button" color="primary" sx={{ p: '10px' }} aria-label="search">
         <SearchIcon />
       </IconButton>
-      {/* {getAllMansions()} */}
     </Paper>
   );
 }
