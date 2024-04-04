@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
@@ -5,7 +7,31 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import TextField from '@mui/material/TextField';
+import client from '../../lib/client';
+import { gql } from '@apollo/client';
+
+const getAllMansions = async () => {
+  const GET_MANSIONS = gql`
+    query GetMansions($name: String!) {
+      mansionList(name: $name) {
+        names
+      }
+    }
+  `;
+
+  try {
+    const { data } = await client.query({
+      query: GET_MANSIONS,
+      variables: {
+        name: "旗",
+      },
+    });
+
+    return data.mansionList;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 export default function CustomizedInputBase() {
   return (
@@ -20,11 +46,13 @@ export default function CustomizedInputBase() {
         sx={{ ml: 1, flex: 1 }}
         placeholder="Input the name of the mansion house"
         inputProps={{ 'aria-label': 'search mansion trends' }}
+        onBlur={getAllMansions}
       />
       <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
       <IconButton type="button" color="primary" sx={{ p: '10px' }} aria-label="search">
         <SearchIcon />
       </IconButton>
+      {/* {getAllMansions()} */}
     </Paper>
   );
 }
