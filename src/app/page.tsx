@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
 import Divider from '@mui/material/Divider';
@@ -9,32 +9,37 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import client from '../../lib/client';
 import { gql } from '@apollo/client';
-
-const getAllMansions = async (event) => {
-  const GET_MANSIONS = gql`
-    query GetMansions($name: String!) {
-      mansionList(name: $name) {
-        names
-      }
-    }
-  `;
-
-  try {
-    const { data } = await client.query({
-      query: GET_MANSIONS,
-      variables: {
-        name: event.target.value || '旗の台',
-      },
-    });
-
-    return data.mansionList;
-  } catch (error) {
-    console.error(error);
-  }
-};
+import MansionList from './list';
 
 export default function CustomizedInputBase() {
-  const [value, setValue] = React.useState();
+  const [mansions, setMansions] = useState([]);
+
+  const getAllMansions = async (event) => {
+    const GET_MANSIONS = gql`
+      query GetMansions($name: String!) {
+        mansionList(name: $name) {
+          names
+        }
+      }
+    `;
+
+    try {
+      const { data } = await client.query({
+        query: GET_MANSIONS,
+        variables: {
+          name: event.target.value || '旗の台',
+        },
+      });
+
+      setMansions(data.mansionList.names);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // useEffect(() => {
+  //   getAllMansions(); // call getAllMansions when the component mounts
+  // }, []); 
 
   return (
     <Paper
@@ -55,6 +60,7 @@ export default function CustomizedInputBase() {
       <IconButton type="button" color="primary" sx={{ p: '10px' }} aria-label="search">
         <SearchIcon />
       </IconButton>
+      <MansionList mansions={mansions} />
     </Paper>
   );
 }
